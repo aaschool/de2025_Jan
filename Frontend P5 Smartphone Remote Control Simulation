@@ -1,0 +1,121 @@
+let systemOn = false;
+let followMode = true;
+let obstacleDetected = false;
+let batteryLevel = 100;
+let x = 300;
+let y = 400;
+
+function setup() {
+  createCanvas(600, 700);
+  textAlign(CENTER, CENTER);
+}
+
+function draw() {
+  background(240);
+
+  // UI Panel Background
+  fill(220);
+  rect(0, 0, width, 240);
+
+  // System Toggle
+  fill(systemOn ? 'lightgreen' : 'lightcoral');
+  rect(30, 30, 180, 50);
+  fill(0);
+  text(systemOn ? 'System ON' : 'System OFF', 120, 55);
+
+  // Mode Toggle
+  if (systemOn) {
+    fill(followMode ? 'lightblue' : 'lightyellow');
+    rect(240, 30, 180, 50);
+    fill(0);
+    text(followMode ? 'FOLLOW MODE' : 'MANUAL MODE', 330, 55);
+  }
+
+  // Battery Indicator
+  fill(0);
+  text(`Battery: ${batteryLevel.toFixed(0)}%`, 500, 50);
+
+  // Manual Controls
+  if (systemOn && !followMode && !obstacleDetected) {
+    fill(overButton(240, 100, 120, 30) ? 'lightgreen' : 200);
+    rect(240, 100, 120, 30);
+    text('⬆️ Forward', 300, 115);
+
+    fill(overButton(180, 140, 100, 30) ? 'lightgreen' : 200);
+    rect(180, 140, 100, 30);
+    text('⬅️ Left', 230, 155);
+
+    fill(overButton(320, 140, 100, 30) ? 'lightgreen' : 200);
+    rect(320, 140, 100, 30);
+    text('➡️ Right', 370, 155);
+
+    fill(overButton(240, 180, 120, 30) ? 'lightgreen' : 200);
+    rect(240, 180, 120, 30);
+    text('⬇️ Back', 300, 195);
+  }
+
+  // Environment boundaries
+  stroke(0);
+  noFill();
+  rect(50, 260, 500, 400);
+  noStroke();
+
+  // Suitcase visualization
+  fill(180);
+  rect(x - 25, y - 25, 50, 50, 10);
+  fill(0);
+  text('Suitcase', x, y);
+
+  // Collision detection + shift away from boundary
+  if (x - 25 <= 50) {
+    x = 50 + 25 + 1;
+    obstacleDetected = true;
+    followMode = false;
+  } else if (x + 25 >= 550) {
+    x = 550 - 25 - 1;
+    obstacleDetected = true;
+    followMode = false;
+  }
+  if (y - 25 <= 260) {
+    y = 260 + 25 + 1;
+    obstacleDetected = true;
+    followMode = false;
+  } else if (y + 25 >= 660) {
+    y = 660 - 25 - 1;
+    obstacleDetected = true;
+    followMode = false;
+  }
+
+  // Obstacle LED
+  fill(obstacleDetected ? 'red' : 'grey');
+  ellipse(500, 100, 30);
+  fill(0);
+  text('Obstacle', 500, 130);
+
+  // Continuous movement logic
+  if (systemOn && !obstacleDetected && !followMode) {
+    if (overButton(240, 100, 120, 30)) {
+      y -= 2;
+    } else if (overButton(180, 140, 100, 30)) {
+      x -= 2;
+    } else if (overButton(320, 140, 100, 30)) {
+      x += 2;
+    } else if (overButton(240, 180, 120, 30)) {
+      y += 2;
+    }
+  }
+}
+
+function overButton(xB, yB, wB, hB) {
+  return (mouseIsPressed && mouseX > xB && mouseX < xB + wB && mouseY > yB && mouseY < yB + hB);
+}
+
+function mousePressed() {
+  if (mouseX > 30 && mouseX < 210 && mouseY > 30 && mouseY < 80) {
+    systemOn = !systemOn;
+  }
+  if (systemOn && mouseX > 240 && mouseX < 420 && mouseY > 30 && mouseY < 80) {
+    followMode = !followMode;
+    if (followMode) obstacleDetected = false;
+  }
+}
