@@ -1,0 +1,73 @@
+let followMode = true;
+let obstacleDetected = false;
+let distance = 0;
+
+function setup() {
+  createCanvas(600, 700);
+  textAlign(CENTER, CENTER);
+}
+
+function draw() {
+  background(230);
+
+  // Obstruction above the suitcase
+  fill(255, 100, 100);
+  ellipse(mouseX, 400, 40);
+  fill(0);
+  text('Obstruction', mouseX, 370);
+
+  // Virtual distance (obstruction X to suitcase X)
+  let suitcaseCenterX = 300;
+  let suitcaseCenterY = 500;
+  let distancePx = abs(suitcaseCenterX - mouseX);
+  distance = map(distancePx, 0, width, 0, 200); // Approximate cm value
+  obstacleDetected = (distance < 30);
+
+  // Obstacle LED
+  fill(obstacleDetected ? 'red' : 'grey');
+  ellipse(500, 50, 30);
+  fill(0);
+  text('Obstacle LED', 500, 80);
+
+
+  // Safety zone represented as a shaded area
+  noStroke();
+  fill(255, 0, 0, 50);
+  ellipse(suitcaseCenterX, suitcaseCenterY, 225, 225);
+  fill(0);
+  text('Stopping Zone (30cm from center)', suitcaseCenterX, suitcaseCenterY - 50);
+
+  // Suitcase static visualization
+  drawUltrasonicSensor(300, 150);
+  drawSuitcase(suitcaseCenterX, suitcaseCenterY);
+
+  // Movement status label
+  fill(0);
+  if (obstacleDetected) {
+    text('Suitcase Stopped (obstruction too close)', suitcaseCenterX, suitcaseCenterY + 50);
+  } else {
+    text('Suitcase Ready to Move Forward', suitcaseCenterX, suitcaseCenterY + 50);
+  }
+
+  // Debug info
+  fill(0);
+  text(`Distance: ${distance.toFixed(1)} cm`, 300, 250);
+}
+
+function drawUltrasonicSensor(cx, cy) {
+  fill(150);
+  rect(cx - 30, cy - 20, 60, 40, 5);
+  fill(0);
+  ellipse(cx - 15, cy, 10);
+  ellipse(cx + 15, cy, 10);
+  stroke(0);
+  line(cx, cy + 20, cx, cy + 80);
+  noStroke();
+}
+
+function drawSuitcase(cx, cy) {
+  fill(180);
+  rect(cx - 25, cy - 25, 50, 50, 10);
+  fill(0);
+  text('Suitcase', cx, cy);
+}
