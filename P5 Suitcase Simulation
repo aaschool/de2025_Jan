@@ -1,0 +1,78 @@
+let systemOn = false;
+let followMode = true;
+let obstacleDetected = false;
+
+let personX = 300; // Person position
+let personY = 150;
+
+let suitcaseX = 300; // Suitcase position
+let suitcaseY = 500;
+
+function setup() {
+  createCanvas(600, 700);
+  textAlign(CENTER, CENTER);
+}
+
+function draw() {
+  background(240);
+
+  // UI Panel
+  fill(systemOn ? 'lightgreen' : 'lightcoral');
+  rect(30, 30, 180, 50);
+  fill(0);
+  text(systemOn ? 'System ON' : 'System OFF', 120, 55);
+
+  if (systemOn) {
+    fill(followMode ? 'lightblue' : 'lightyellow');
+    rect(240, 30, 180, 50);
+    fill(0);
+    text(followMode ? 'FOLLOW MODE' : 'MANUAL MODE', 330, 55);
+  }
+
+  // Person representation (follows mouse)
+  personX = constrain(mouseX, 50, 550);
+  personY = constrain(mouseY, 50, 660); // Extend range downward
+  fill(100, 100, 255);
+  ellipse(personX, personY, 40);
+  fill(0);
+  text('Person', personX, personY);
+
+  // Measure virtual distance between suitcase and person
+  let distance = dist(suitcaseX, suitcaseY, personX, personY);
+  obstacleDetected = distance < 80;
+
+  // Obstacle LED
+  fill(obstacleDetected ? 'red' : 'grey');
+  ellipse(500, 100, 30);
+  fill(0);
+  text('Obstacle', 500, 130);
+
+  // Suitcase
+  fill(180);
+  rect(suitcaseX - 25, suitcaseY - 25, 50, 50, 10);
+  fill(0);
+  text('Suitcase', suitcaseX, suitcaseY);
+
+  // Suitcase logic (autonomous follow mode)
+  if (systemOn && followMode && !obstacleDetected) {
+    followPerson();
+  }
+}
+
+function followPerson() {
+  let stepSize = 1.5;
+  if (personX > suitcaseX + 5) suitcaseX += stepSize;
+  if (personX < suitcaseX - 5) suitcaseX -= stepSize;
+  if (personY > suitcaseY + 5) suitcaseY += stepSize;
+  if (personY < suitcaseY - 5) suitcaseY -= stepSize;
+}
+
+function mousePressed() {
+  if (mouseX > 30 && mouseX < 210 && mouseY > 30 && mouseY < 80) {
+    systemOn = !systemOn;
+  }
+
+  if (systemOn && mouseX > 240 && mouseX < 420 && mouseY > 30 && mouseY < 80) {
+    followMode = !followMode;
+  }
+}
