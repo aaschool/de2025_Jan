@@ -6,9 +6,14 @@ function setup() {
 let systemOn = false;
 let followMode = true;
 let obstacleDetected = false;
+let batteryLevel = 100;
 
 function draw() {
   background(240);
+
+  // Battery Simulation
+  batteryLevel -= 0.02;
+  if (batteryLevel < 0) batteryLevel = 100;
 
   // ON/OFF Button
   fill(systemOn ? 'lightgreen' : 'lightcoral');
@@ -34,6 +39,10 @@ function draw() {
   ellipse(200, 200, 40);
   fill(0);
   text('Obstacle LED', 200, 250);
+
+  // Battery Indicator
+  fill(0);
+  text(`Battery: ${batteryLevel.toFixed(0)}%`, 200, 20);
 }
 
 function mousePressed() {
