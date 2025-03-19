@@ -1,0 +1,92 @@
+// Define pins for ultrasonic sensor
+#define TRIG_PIN 9 // Trigger pin for HC-SR04
+#define ECHO_PIN 10 // Echo pin for HC-SR04
+
+// Define LED indicator pin
+#define LED_PIN 13 // Onboard or external LED for obstacle alert
+
+// Define motor driver pins (L298N)
+#define LM_IN1 4 // Left motor IN1
+#define LM_IN2 5 // Left motor IN2
+#define RM_IN1 6 // Right motor IN1
+#define RM_IN2 7 // Right motor IN2
+#define LM_EN 3  // Left motor enable (PWM)
+#define RM_EN 11 // Right motor enable (PWM)
+
+// Stopping distance threshold in centimeters
+const int stopDistance = 30; // cm
+
+void setup() {
+  // Set ultrasonic sensor pins
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  
+  // Set LED pin
+  pinMode(LED_PIN, OUTPUT);
+  
+  // Set motor driver control pins as outputs
+  pinMode(LM_IN1, OUTPUT);
+  pinMode(LM_IN2, OUTPUT);
+  pinMode(RM_IN1, OUTPUT);
+  pinMode(RM_IN2, OUTPUT);
+  pinMode(LM_EN, OUTPUT);
+  pinMode(RM_EN, OUTPUT);
+
+  // Initialize Serial Monitor for debugging
+  Serial.begin(9600);
+}
+
+void loop() {
+  long duration, distance;
+
+  // Trigger ultrasonic sensor pulse
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2); // Short delay to stabilize signal
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10); // Send 10us pulse to TRIG
+  digitalWrite(TRIG_PIN, LOW);
+
+  // Read echo pulse duration
+  duration = pulseIn(ECHO_PIN, HIGH);
+  
+  // Convert duration to distance in cm
+  distance = duration * 0.034 / 2;
+
+  // Display distance on Serial Monitor
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Obstacle detection condition
+  if (distance < stopDistance && distance > 0) {
+    stopMotors(); // Stop motors if obstacle detected
+    digitalWrite(LED_PIN, HIGH); // Turn LED ON
+  } else {
+    forward(); // Move forward if path is clear
+    digitalWrite(LED_PIN, LOW); // Turn LED OFF
+  }
+
+  delay(100); // Small delay for stability
+}
+
+// Function to move suitcase forward
+void forward() {
+  digitalWrite(LM_IN1, HIGH); // Left motor forward
+  digitalWrite(LM_IN2, LOW);
+  analogWrite(LM_EN, 180); // PWM speed
+
+  digitalWrite(RM_IN1, HIGH); // Right motor forward
+  digitalWrite(RM_IN2, LOW);
+  analogWrite(RM_EN, 180);
+}
+
+// Function to stop both motors
+void stopMotors() {
+  digitalWrite(LM_IN1, LOW);
+  digitalWrite(LM_IN2, LOW);
+  analogWrite(LM_EN, 0);
+
+  digitalWrite(RM_IN1, LOW);
+  digitalWrite(RM_IN2, LOW);
+  analogWrite(RM_EN, 0);
+}
