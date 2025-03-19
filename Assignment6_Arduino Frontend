@@ -1,0 +1,56 @@
+// COMPONENTS:
+// 1. Arduino Uno or Nano
+// 2. Push Button for ON/OFF toggle (connected to pin 2)
+// 3. Push Button for MODE toggle (connected to pin 3)
+// 4. LED for obstacle detection indicator (connected to pin 13)
+// 5. Optional: 10kΩ pull-down resistors (if using external pull-downs)
+
+#define ON_OFF_BUTTON 2      // Push Button #1: System ON/OFF toggle
+#define MODE_BUTTON 3        // Push Button #2: Follow/Manual mode toggle
+#define OBSTACLE_LED 13      // LED: Obstacle detection indicator
+
+bool systemOn = false;       // State variable: System power status
+bool followMode = true;      // State variable: Follow or Manual mode
+bool obstacleDetected = false; // Simulated obstacle detection state
+
+void setup() {
+  pinMode(ON_OFF_BUTTON, INPUT_PULLUP); // Button with internal pull-up resistor
+  pinMode(MODE_BUTTON, INPUT_PULLUP);   // Button with internal pull-up resistor
+  pinMode(OBSTACLE_LED, OUTPUT);        // LED output pin
+
+  Serial.begin(9600); // Initialize Serial Monitor for debugging
+}
+
+void loop() {
+  // Read ON/OFF button (active LOW, with debounce)
+  if (digitalRead(ON_OFF_BUTTON) == LOW) {
+    delay(200); // Simple debounce
+    systemOn = !systemOn; // Toggle system ON/OFF
+  }
+
+  // Read MODE button (active LOW, only when system is ON)
+  if (systemOn && digitalRead(MODE_BUTTON) == LOW) {
+    delay(200); // Simple debounce
+    followMode = !followMode; // Toggle Follow/Manual mode
+  }
+
+  // Simulated obstacle logic (this would normally be replaced by ultrasonic sensor input)
+  if (systemOn && followMode) {
+    obstacleDetected = random(0, 100) < 5; // Randomly simulate obstacle detection
+  } else {
+    obstacleDetected = false;
+  }
+
+  // LED status indicator
+  digitalWrite(OBSTACLE_LED, obstacleDetected ? HIGH : LOW);
+
+  // Debugging output on Serial Monitor
+  Serial.print("System: ");
+  Serial.print(systemOn ? "ON" : "OFF");
+  Serial.print(" | Mode: ");
+  Serial.print(followMode ? "FOLLOW" : "MANUAL");
+  Serial.print(" | Obstacle: ");
+  Serial.println(obstacleDetected ? "DETECTED" : "CLEAR");
+
+  delay(100); // Short delay for stability
+}
