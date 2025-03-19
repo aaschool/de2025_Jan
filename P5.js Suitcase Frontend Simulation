@@ -1,0 +1,46 @@
+function setup() {
+  createCanvas(400, 300);
+  textAlign(CENTER, CENTER);
+}
+
+let systemOn = false;
+let followMode = true;
+let obstacleDetected = false;
+
+function draw() {
+  background(240);
+
+  // ON/OFF Button
+  fill(systemOn ? 'lightgreen' : 'lightcoral');
+  rect(50, 50, 100, 50);
+  fill(0);
+  text(systemOn ? 'System ON' : 'System OFF', 100, 75);
+
+  // Mode Toggle
+  if (systemOn) {
+    fill(followMode ? 'lightblue' : 'lightyellow');
+    rect(250, 50, 100, 50);
+    fill(0);
+    text(followMode ? 'FOLLOW' : 'MANUAL', 300, 75);
+  }
+
+  // Obstacle Detection LED
+  if (systemOn && followMode) {
+    obstacleDetected = frameCount % 120 < 30; // Simulated blinking
+  } else {
+    obstacleDetected = false;
+  }
+  fill(obstacleDetected ? 'red' : 'grey');
+  ellipse(200, 200, 40);
+  fill(0);
+  text('Obstacle LED', 200, 250);
+}
+
+function mousePressed() {
+  if (mouseX > 50 && mouseX < 150 && mouseY > 50 && mouseY < 100) {
+    systemOn = !systemOn;
+  }
+  if (systemOn && mouseX > 250 && mouseX < 350 && mouseY > 50 && mouseY < 100) {
+    followMode = !followMode;
+  }
+}
